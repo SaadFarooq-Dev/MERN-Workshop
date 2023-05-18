@@ -4,11 +4,13 @@ const morgan = require("morgan")
 
 const app = express()
 
+app.use(express.json({ extended: false }))
 app.use(cors("*"))
 app.use(morgan('tiny'))
 app.get('/', (req, res) => {
   res.send("Api is running")
 })
+app.use('/api/users', require('./routes/api/user'))
 
 const PORT = process.env.PORT || 8564
 

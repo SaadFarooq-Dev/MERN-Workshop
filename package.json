@@ -1,12 +1,12 @@
 {
-  "name": "app",
+  "name": "node-2",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
