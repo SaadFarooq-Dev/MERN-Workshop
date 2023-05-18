@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const UserModel = require('../../models/User')
 
 let users = [
   { id: '1', name: 'John' },
@@ -9,23 +10,6 @@ let users = [
   { id: '5', name: 'Tom' }
 ]
 
-// @route     GET api/users/:id
-// @desc      Get user by Id
-// @access    Public
-
-router.get('/:id', async (req, res) => {
-  try {
-    console.log(req.params.id);
-    const user = users.filter(user => user.id === req.params.id)
-    if (user.length > 0) {
-      return res.status(200).json(user);
-    }
-    return res.status(404).json({ msg: 'User not found' });
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json('Server Error: ' + error.message);
-  }
-});
 
 // @route     GET api/users
 // @desc      Get all users
@@ -46,13 +30,14 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    if (req.body.id && req.body.name) {
-      existingUser = users.filter(user => user.id === req.body.id)
-      if (existingUser.length > 0) {
-        return res.status(400).json({ msg: 'User already exists' })
+    if (req.body.email && req.body.name) {
+      const { name, email } = req.body
+      let user = await UserModel.findOne({ email })
+      if (user) {
+        return res.status(400).json({ errors: [{ message: 'User already exists' }] })
       }
-      users.push({ id: req.body.id, name: req.body.name })
-      return res.status(200).json({ msg: 'user Created successfully' })
+      user = await UserModel.create({ name, email})
+      return res.status(200).json(user)
     }
     res.status(400).json({ msg: "Invalid user data" })
   } catch (error) {
@@ -60,6 +45,26 @@ router.post('/', async (req, res) => {
     res.status(500).json('Server Error: ' + error.message);
   }
 });
+
+// @route     GET api/users/:id
+// @desc      Get user by Id
+// @access    Public
+
+router.get('/:id', async (req, res) => {
+  try {
+    console.log(req.params.id);
+    const user = users.filter(user => user.id === req.params.id)
+    if (user.length > 0) {
+      return res.status(200).json(user);
+    }
+    return res.status(404).json({ msg: 'User not found' });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json('Server Error: ' + error.message);
+  }
+});
+
+
 
 // @route     DELETE api/users/:id
 // @desc      Delete a user
