@@ -4,10 +4,6 @@ import userModel from '../../models/User.js';
 
 const userRouter = express.Router()
 
-// When creating routes please make routes with doesn't require :id or any other params to bs placed in the last
-// While the routes without params should be created first.
-// So when the request is made it first compares with the non params route and then compares with the params route
-// Here I am taking about path params only
 
 // @route     GET api/users
 // @desc      Get all users
@@ -15,7 +11,7 @@ const userRouter = express.Router()
 
 userRouter.get('/', async (req, res) => {
   try {
-    const users = await userModel.find().sort({ createdAt: '-1' })
+    const users = await userModel.find().select('-password').sort({ createdAt: '-1' })
     return res.status(200).json(users);
   } catch (error) {
     console.error(error.message);
@@ -31,13 +27,15 @@ userRouter.post('/', async (req, res) => {
   try {
     if (req.body.email && req.body.name) {
 
-      const { name, email } = req.body
+      const { name, email, password } = req.body
 
       let user = await userModel.findOne({ email })
       if (user) {
         return res.status(422).json({ errors: [{ message: 'User already exists' }] })
       }
-      user = await userModel.create({ name, email })
+      user = await userModel.create({ name, email, password })
+      user = user.toObject()
+      delete user.password
       return res.status(200).json(user)
     }
     res.status(403).json({ msg: "Invalid Data" })
@@ -53,7 +51,7 @@ userRouter.post('/', async (req, res) => {
 
 userRouter.get('/:id', async (req, res) => {
   try {
-    const user = await userModel.findById(req.params.id)
+    const user = await userModel.findById(req.params.id).select('-password')
     if (user) {
       return res.status(200).json(user)
     }
@@ -87,8 +85,8 @@ userRouter.delete('/:id', async (req, res) => {
 
 userRouter.patch('/:id', async (req, res) => {
   try {
-    if (req.body.name || req.body.email) {
-      const user = await userModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    if (req.body.name || req.body.email || req.body.password) {
+      const user = await userModel.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password')
       if (user) {
         return res.status(200).json(user)
       }
