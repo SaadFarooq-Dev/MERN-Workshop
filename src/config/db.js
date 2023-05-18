@@ -1,6 +1,7 @@
-const mongoose = require('mongoose')
+import mongoose from "mongoose"
 
 mongoose.set('strictQuery', false)
+
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI)
@@ -11,4 +12,4 @@ const connectDB = async () => {
   }
 }
 
-module.exports = connectDB
+export default connectDB

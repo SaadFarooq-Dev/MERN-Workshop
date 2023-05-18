@@ -1,5 +1,6 @@
 {
-  "name": "node-2",
+  "name": "node-4",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",

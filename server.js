@@ -1,9 +1,11 @@
-require('dotenv/config')
+import 'dotenv/config'
 
-const express = require("express")
-const cors = require("cors")
-const morgan = require("morgan")
-const connectDB  = require("./config/db")
+import express from "express"
+import cors from 'cors'
+import morgan from "morgan"
+
+import connectDB from "./src/config/db.js"
+import userRouter from './src/routes/api/user.js'
 
 connectDB()
 
@@ -12,10 +14,12 @@ const app = express()
 app.use(express.json({ extended: false }))
 app.use(cors("*"))
 app.use(morgan('tiny'))
+
 app.get('/', (req, res) => {
   res.send("Api is running")
 })
-app.use('/api/users', require('./routes/api/user'))
+
+app.use('/api/users', userRouter)
 
 const PORT = process.env.PORT || 8564
 
