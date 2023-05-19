@@ -1,103 +1,22 @@
 import express from 'express'
-
-import userModel from '../../models/User.js';
+import { createUser, deleteUser, getUser, getusers, handleLogin, patchUser } from '../../controllers/users.js';
+import { userAuth } from '../../middleware/userAuth.js';
 
 const userRouter = express.Router()
 
+userRouter
+  .route('/')
+  .get(getusers)
+  .post(createUser)
 
-// @route     GET api/users
-// @desc      Get all users
-// @access    Public
+userRouter
+  .route('/:id')
+  .get(getUser)
+  .patch(patchUser)
+  .delete(deleteUser)
 
-userRouter.get('/', async (req, res) => {
-  try {
-    const users = await userModel.find().select('-password').sort({ createdAt: '-1' })
-    return res.status(200).json(users);
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json('Server Error: ' + error.message);
-  }
-});
-
-// @route     POST api/users
-// @desc      Create a user
-// @access    Public
-
-userRouter.post('/', async (req, res) => {
-  try {
-    if (req.body.email && req.body.name) {
-
-      const { name, email, password } = req.body
-
-      let user = await userModel.findOne({ email })
-      if (user) {
-        return res.status(422).json({ errors: [{ message: 'User already exists' }] })
-      }
-      user = await userModel.create({ name, email, password })
-      user = user.toObject()
-      delete user.password
-      return res.status(200).json(user)
-    }
-    res.status(403).json({ msg: "Invalid Data" })
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json('Server Error: ' + error.message);
-  }
-});
-
-// @route     GET api/users/:id
-// @desc      Get user by Id
-// @access    Public
-
-userRouter.get('/:id', async (req, res) => {
-  try {
-    const user = await userModel.findById(req.params.id).select('-password')
-    if (user) {
-      return res.status(200).json(user)
-    }
-    return res.status(404).json({ errors: [{ message: 'No such document exists for the given Id' }] })
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json('Server Error: ' + error.message);
-  }
-});
-
-// @route     DELETE api/users/:id
-// @desc      Delete a user
-// @access    Public
-
-userRouter.delete('/:id', async (req, res) => {
-  try {
-    const user = await userModel.deleteOne({ _id: req.params.id })
-    if (user.deletedCount) {
-      return res.status(200).json(`User: ${req.params.id} deleted`)
-    }
-    return res.status(404).json({ errors: [{ message: 'No such document exists for the given Id' }] })
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json('Server Error: ' + error.message);
-  }
-});
-
-// @route     PATCH api/users/:id
-// @desc      Patch a user
-// @access    Public
-
-userRouter.patch('/:id', async (req, res) => {
-  try {
-    if (req.body.name || req.body.email || req.body.password) {
-      const user = await userModel.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password')
-      if (user) {
-        return res.status(200).json(user)
-      }
-      return res.status(404).json({ errors: [{ message: 'No such document exists for the given Id' }] })
-    }
-    return res.status(403).json({ errors: [{ message: 'Invalid Data' }] })
-
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json('Server Error: ' + error.message);
-  }
-});
+userRouter
+  .route('/login')
+  .post(userAuth, handleLogin)
 
 export default userRouter
