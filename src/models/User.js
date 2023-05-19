@@ -3,7 +3,7 @@ import mongoose from "mongoose"
 
 const { Schema } = mongoose
 
-const userSchema = new Schema(
+const UserSchema = new Schema(
   {
     name: {
       type: String,
@@ -17,13 +17,14 @@ const userSchema = new Schema(
     password: {
       type: String,
       max: 255,
+      select: false,
       required: true
     }
   },
   { timestamps: true }
 )
 
-userSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function (next) {
   if (!this.isModified("password")) return next();
 
   const saltRound = 10
@@ -36,7 +37,14 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
+UserSchema.methods.isValidPassword = async function (password) {
+  const user = this
+  const isPasswordValid = await bcrypt.compare(password, user.password)
+  console.log('instance method isValidPassword ran: ' + isPasswordValid)
 
-const userModel = mongoose.model('User', userSchema)
+  return isPasswordValid
+}
 
-export default userModel
+const UserModel = mongoose.model('User', UserSchema)
+
+export default UserModel
