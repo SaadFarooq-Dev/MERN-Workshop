@@ -1,8 +1,8 @@
 import UserModel from "../models/User.js";
 
-export const getusers = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
-    const users = await UserModel.find().sort({ createdAt: '-1' })
+    const users = await UserModel.find().populate('posts').sort({ createdAt: '-1' })
     return res.status(200).json(users);
   } catch (error) {
     console.error(error.message);
@@ -12,7 +12,7 @@ export const getusers = async (req, res) => {
 
 export const getUser = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.params.id)
+    const user = await UserModel.findById(req.params.id).populate('posts')
     if (user) {
       return res.status(200).json(user)
     }
@@ -69,15 +69,6 @@ export const deleteUser = async (req, res) => {
       return res.status(200).json(`User: ${req.params.id} deleted`)
     }
     return res.status(404).json({ errors: [{ message: 'No such document exists for the given Id' }] })
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json('Server Error: ' + error.message);
-  }
-}
-
-export const handleLogin = async (req, res) => {
-  try {
-    return req.isPasswordValid ? res.status(200).json({ mssage: "logged in successfully" }) : res.status(404).json({ errors: [{ message: 'Invalid Credentials' }] })
   } catch (error) {
     console.error(error.message);
     res.status(500).json('Server Error: ' + error.message);
