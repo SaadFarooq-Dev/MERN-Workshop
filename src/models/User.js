@@ -45,6 +45,14 @@ UserSchema.methods.isValidPassword = async function (password) {
   return isPasswordValid
 }
 
+UserSchema.virtual('posts', {
+  ref:'Post',
+  localField: '_id',
+  foreignField:'author'
+})
+
+UserSchema.set('toJSON', { virtuals: true });
+
 const UserModel = mongoose.model('User', UserSchema)
 
 export default UserModel

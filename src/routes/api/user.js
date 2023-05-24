@@ -1,12 +1,11 @@
 import express from 'express'
-import { createUser, deleteUser, getUser, getusers, handleLogin, patchUser } from '../../controllers/users.js';
-import { userAuth } from '../../middleware/userAuth.js';
+import { createUser, deleteUser, getUser, getUsers, patchUser } from '../../controllers/users.js';
 
 const userRouter = express.Router()
 
 userRouter
   .route('/')
-  .get(getusers)
+  .get(getUsers)
   .post(createUser)
 
 userRouter
@@ -14,9 +13,5 @@ userRouter
   .get(getUser)
   .patch(patchUser)
   .delete(deleteUser)
-
-userRouter
-  .route('/login')
-  .post(userAuth, handleLogin)
 
 export default userRouter

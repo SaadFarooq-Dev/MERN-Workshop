@@ -6,6 +6,8 @@ import morgan from "morgan"
 
 import connectDB from "./src/config/db.js"
 import userRouter from './src/routes/api/user.js'
+import authRouter from './src/routes/api/auth.js'
+import postRouter from './src/routes/api/post.js'
 
 connectDB()
 
@@ -19,6 +21,8 @@ app.get('/', (req, res) => {
   res.send("Api is running")
 })
 
+app.use('/api/auth', authRouter)
+app.use('/api/posts', postRouter)
 app.use('/api/users', userRouter)
 
 const PORT = process.env.PORT || 8564
