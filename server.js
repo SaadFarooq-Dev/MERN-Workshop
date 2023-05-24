@@ -5,6 +5,7 @@ import cors from 'cors'
 import morgan from "morgan"
 
 import connectDB from "./src/config/db.js"
+import _initializePassport from './src/config/passport.js'
 import userRouter from './src/routes/api/user.js'
 import authRouter from './src/routes/api/auth.js'
 import postRouter from './src/routes/api/post.js'
