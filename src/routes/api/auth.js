@@ -1,5 +1,4 @@
 import express from 'express'
-import { signUp } from '../../controllers/auths.js'
 import passport from 'passport'
 
 import { loginUser, signUp } from '../../controllers/auths.js'
