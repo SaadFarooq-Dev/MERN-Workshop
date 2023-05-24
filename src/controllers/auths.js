@@ -37,3 +37,19 @@ export const signUp = async (req, res) => {
     res.status(500).json('Server Error: ' + error.message);
   }
 }
+
+export const loginUser = async (req, res, next) => {
+  try {
+    jwt.sign(
+      req.user,
+      process.env.JWTSECRET,
+      { expiresIn: 36000 },
+      async (err, token) => {
+        if (err) throw err
+        res.json({ token })
+      }
+    )
+  } catch (error) {
+    next(error)
+  }
+}
