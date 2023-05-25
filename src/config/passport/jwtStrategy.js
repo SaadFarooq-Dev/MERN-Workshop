@@ -1,8 +1,26 @@
-//The current Content in this file is wrong.
+import passportJWT from 'passport-jwt'
+import UserModel from '../../models/User.js'
 
-const jwtStrategy = () => {
-  //Creat the JWT Strategy
-  //This function is dummy function to ignore the import error in the passport.js
-}
 
-export default jwtStrategy
+const ExtractJwt = passportJWT.ExtractJwt
+const JWTstrategy = passportJWT.Strategy
+
+export default new JWTstrategy(
+  {
+    secretOrKey: process.env.JWTSECRET,
+    jwtFromRequest: ExtractJwt.fromHeader('x-auth-token'),
+    passReqToCallback: true
+  },
+  async (req, token, done) => {
+    try {
+      const user = await UserModel.findById(token.id)
+      if (user) {
+        req.user = user
+        return done(null, user)
+      }
+      return done(null, false, { message: 'Invalid user token' })
+    } catch (err) {
+      return done(err)
+    }
+  }
+)
